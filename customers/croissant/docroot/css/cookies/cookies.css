@@ -1,0 +1,43 @@
+#cookies {
+	background: none repeat scroll 0 0 rgba(255, 255, 255, 0.9);
+	bottom: 0;
+	box-shadow: 2px 2px 25px black;
+	color: #333333;
+	font-size: 14px;
+	height: 40px;
+	position: fixed;
+	left: 0;
+	bottom: 0px;
+	width: 100%;
+	z-index: 2000;
+	display: none;
+}
+
+#cookies p {
+	letter-spacing: 0;
+	margin: 10px auto;
+	padding-right: 120px;
+	width: 650px;
+}
+button {
+	border: 0 none;
+	font-size: 1.8em;
+	background-color: transparent;
+	cursor: pointer;
+	float: right;
+	overflow: hidden;
+	position: absolute;
+	right: 5px;
+	top: -5px;
+	color: #B53D26;
+	font-family:"bello-pro";
+	-webkit-font-smoothing:antialiased;
+	
+}
+
+.inner {
+	margin: 0 auto;
+	position: relative;
+	text-align: center;
+	width: 1024px;
+}

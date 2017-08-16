@@ -1,0 +1,11 @@
+{
+	"name": "croissant",
+	"description": "The Croissant Framework.",
+	"keywords": ["framework", "croissant"],
+	"license": "private",
+	"require": {
+	},
+	"config": {
+	},
+	"minimum-stability": "stable"
+}
