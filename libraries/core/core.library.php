@@ -236,7 +236,6 @@ function ds($function, $parameters = array(), $database = '') {
  * @return
  */
 function _log($data) {
-	return;
 	if (DEBUG != 1) return;
 	if (!strpos($_SERVER['QUERY_STRING'], 'images')) {
 		if ($data == 'Page end') {
@@ -248,7 +247,7 @@ function _log($data) {
 			$extra = "\n";
 		}
 		$data = print_r($data, true);
-		$logfile = TEMP_PATH . '/tm.debug_logfile.log';
+		$logfile = TEMP_PATH . '/croissant.debug_logfile.log';
 		$data = $preextra.'['.date('d/m/Y H:m:s', time()).';'.number_format((microtime(true) - $_SESSION['last']) * 1000, 2).'ms] TM: '.$data.$extra;
 		$fp = fopen($logfile, 'a+');
 		fwrite($fp, $data, strlen($data));
