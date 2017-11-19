@@ -3,7 +3,7 @@
  * Croissant Web Framework
  *
  * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2013 Tom Gordon
+ * @copyright 2009-2017 Tom Gordon
  *
  */
 class Solr extends Core {
@@ -143,10 +143,6 @@ class Solr extends Core {
 				unset($params['exclude']);
 			}
 
-// 			if (isset($params['sort'])) {
-// 				$q2[] = 'sort='.$params['sort'];
-// 				unset($params['sort']);
-// 			}
 			// clear out specific params, leaving generics
 			unset($params['types']);
 			unset($params['terms']);
@@ -162,7 +158,6 @@ class Solr extends Core {
 		// reset to rebuild query
 		$q = implode(' AND ', $q2);
 
-// dump($q);
 		// make lat/lon params, if any
 		if (isset($params['latitude']) && isset($params['longitude'])) {
 			$latlon[] = 'latitude:'.$params['latitude'];
@@ -171,22 +166,16 @@ class Solr extends Core {
 			unset($params['latitude']);
 			unset($params['longitude']);
 		}
-// 		dump($q);
-// 		dump($params);
-// 		die();
 
 		// make the actual call to search
 		try {
 			if (isset(self::$_solr)) {
 				$response = self::$_solr->search($q, $offset, $limit, $params);
 				$data = json_decode($response->getRawResponse());
-// 				dump($data);
 				return $data;
 			}
 		} catch (Exception $e) {
 			Error::ExceptionHandler($e);
-// 			echo '2';die();
-// 			dump($e);die();
 			return false;
 		}
 	}
