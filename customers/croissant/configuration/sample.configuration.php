@@ -3,7 +3,8 @@
 define('DEBUG', 1);     // 1 = on
 define('HOLDING', 0);
 
-define('DATASERVER', 'croissant.dataserver');
+// use full DNS name for the DATASERVER URI
+define('DATASERVER', 'https://croissant.dataserver/');
 define('DATABASE', 'croissant');
 
 // where to get images and files (set to CDN or absolute path)

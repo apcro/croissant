@@ -1,11 +1,11 @@
 <?php
-/*
- * Croissant Web Framework
-*
-* @author Tom Gordon <tom.gordon@apsumon.com>
-* @copyright 2009-2017 Tom Gordon
-*
-*/
+/**
+ * Croisssant Web Framework
+ *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
+ */
 namespace Croissant;
 
 /*
@@ -14,9 +14,3 @@ namespace Croissant;
  *
  * Typically used to handle logged-in/logged-out variations
  */
-
-if (User::UserID() != 0) {
-	// user is logged in
-} else {
-	// user is not logged in
-}

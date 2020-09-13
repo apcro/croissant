@@ -1,14 +1,20 @@
-/*
- * Croissant Web Framework
- * 
- * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2017 Tom Gordon
- * 
+/**
+ * Croisssant Web Framework
+ *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
  */
-$(document).ready(function() {
-	$('#debugoutput .debug_bar').mouseenter(function() {
-		$('.debug_popout').stop(true, true).fadeIn(100);
-	}).mouseleave(function(){
-		$('.debug_popout').stop(true,true).fadeOut(500);
-	});
-});
+document.addEventListener('DOMContentLoaded', event => {
+	const popout = document.getElementsByClassName('debug_popout')[0];
+	const debugBar = document.getElementById('debugoutput');
+	if (typeof(debugBar) != undefined) {
+
+		document.getElementsByClassName('debug_bar')[0].addEventListener('mouseenter', e => {
+			popout.style.display = "flex";
+		});
+		document.getElementsByClassName('debug_bar')[0].addEventListener('mouseleave', e => {
+			popout.style.display = "none";
+		});
+	}
+});	

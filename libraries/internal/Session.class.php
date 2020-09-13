@@ -1,17 +1,16 @@
 <?php
 /**
- * Croissant Web Framework
+ * Croisssant Web Framework
  *
- * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2017 Tom Gordon
- *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
  */
 namespace Croissant;
 
 Class Session extends Core {
 	static $core;
 	public static function Initialise() {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (!isset(self::$core)) {
 			self::$core = parent::Initialise();
 		}
@@ -30,11 +29,9 @@ Class Session extends Core {
 	 * @return void
 	 */
 	static final private function _loadSession() {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		// we reference this before the autoloader has been initialised,
 		// so we can't use Cookie::GetCookie()
 		$sesskey = isset($_COOKIE['sesskey'])?$_COOKIE['sesskey']:'';
-		if (DEBUG) _log('sesskey::'.$sesskey);
 		// are we getting sessions from $_SESSION or from the dataserver?
 		if (empty($sesskey)) {
 			// set up a new session key - this is a first load or cookies have been cleared
@@ -71,10 +68,9 @@ Class Session extends Core {
 	 * Starts the session handling code, loading data as necessary based on the type of device
 	 * 
 	 * @param int $start
-	 * @return
+	 * @return void
 	 */
 	static final public function Start($markup = 'html') {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		switch ($markup) {
 			case 'wml';
 				break;
@@ -84,7 +80,6 @@ Class Session extends Core {
 				if (!isset($cookie_domain)) {
 					$cookie_domain = ini_get('session.cookie_domain');
 				}
-				if (DEBUG) _log('cookie_domain::'.$cookie_domain);
 				if ($cookie_domain) {
 					$session_name = $cookie_domain;
 				} else {
@@ -93,7 +88,6 @@ Class Session extends Core {
 						$cookie_domain = $_SERVER['HTTP_HOST'];
 					}
 				}
-				if (DEBUG) _log('session_name::'.$session_name);
 				$cookie_domain = explode(':', $cookie_domain);
 				$cookie_domain = $cookie_domain[0];
 				if (count(explode('.', $cookie_domain)) > 2 && !is_numeric(str_replace('.', '', $cookie_domain))) {
@@ -101,7 +95,6 @@ Class Session extends Core {
 				}
 
 				session_name('SESS'. md5($session_name));
-				if (DEBUG) _log('starting session');
 				session_start();
 				break;
 		}
@@ -112,12 +105,6 @@ Class Session extends Core {
 		}
 		self::$core->_session = true;
 
-		// get the user configuration, if any. We need it at this point, but can't load it earlier
-		require_once(BASEPATH.'/configuration/user.configuration.php');
-		foreach(Core::$core->_user_session as $k) {
-			self::$core->_user[$k] = Session::Setvariable($k);
-		}
-
 	}
 
 	/**
@@ -126,16 +113,9 @@ Class Session extends Core {
 	 * This should be truncated if it's too big
 	 */
 	static final public function Store() {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (STATELESS) {
-			$response = ds('session_WriteData', array('key' => $_SESSION['sesskey'], 'data' => $_SESSION));
-			if (isset($response['statusCode']) && $response['statusCode'] == 0) {
-				return true;
-			} else {
-				return false;
-			}
+			return Core::GenericResponse(ds('session_WriteData', array('key' => $_SESSION['sesskey'], 'data' => $_SESSION)));
 		}
-		return;
 	}
 
 	/**
@@ -143,34 +123,25 @@ Class Session extends Core {
 	 * 
 	 * @param string $var
 	 * @param mixed $data
-	 * @return
+	 * @return mixed
 	 */
 	static final public function SetVariable($var, $data) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
-		switch($_SESSION['markup']) {
-			case 'wml':
-				break;
-			case 'html':
-			default:
-				if (!empty($data)) {
-					$_SESSION[$var] = $data;
-				} else {
-					unset($_SESSION[$var]);
-				}
-				break;
+		if (!empty($data)) {
+			$_SESSION[$var] = $data;
+			return $data;
+		} else {
+			unset($_SESSION[$var]);
+			return null;
 		}
-		return;
 	}
 
 	/**
 	 * Get session variable
 	 * 
 	 * @param string $var
-	 * @return
+	 * @return mixed
 	 */
 	static final public function GetVariable($var) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
-		if (DEBUG) _log("\tmarkup: ".$_SESSION['markup'].', var: '.$var);
 		switch($_SESSION['markup']) {
 			case 'wml':
 				break;

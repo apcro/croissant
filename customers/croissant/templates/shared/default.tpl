@@ -50,8 +50,13 @@
 		<div id="noscript">For the best experience, please enable JavaScript</div>
 	</noscript>
 
+	{if $controller_template}
 	{include file="$controller_template"}
-
+	{else}
+		<h1>Welcome to the Croissant Framework</h1>
+		<h2>Make sure to set your $template path correctly.</h2>
+	{/if}
+	
 	{* Attach footer JS files *}
 	{if $js_minified_footer}
 		<script src="/js/{$js_minified_footer}" type="text/javascript"></script>

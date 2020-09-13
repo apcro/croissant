@@ -2,9 +2,11 @@
 
 Croissant is a simple to use web framework designed for speed and scalability.
 
+This is version 2 of the framework.
+
 ## Official Documentation
 
-Documentation for the framework can be found on the [Croissant website](http://www.croissant-framework.com/). This documentation is currently incomplete.
+Documentation for the framework can be found on the [Croissant website](http://www.croissant-framework.com/). 
 
 ### Contributing To Croissant
 
@@ -12,4 +14,7 @@ Documentation for the framework can be found on the [Croissant website](http://w
 
 ### License
 
-The Croissant framework is copyright Tom Gordon
+The Croissant framework is copyright 2009-present Tom Gordon
+
+# Getting Started
+

@@ -1,10 +1,10 @@
 <?php
-/*
- * Croissant Web Framework
+/**
+ * Croisssant Web Framework
  *
- * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2017 Tom Gordon
- *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
  */
 namespace Croissant;
 
@@ -30,7 +30,6 @@ class Cache extends Core {
 	static $core;
 
 	public static function Initialise() {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (!isset(self::$core)) {
 			self::$core = parent::Initialise();
 		}
@@ -50,7 +49,6 @@ class Cache extends Core {
 	 * @return boolean
 	 */
 	static final public function RawSet($key, $data, $cachetype = CACHETYPE, $expiretime = 0) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (empty($key) || empty($data)) {
 			return false;
 		}
@@ -75,7 +73,6 @@ class Cache extends Core {
 	 * @param int $expiretime
 	 */
 	static final public function RawGet($key, $cachetype = CACHETYPE, $expiretime = 0) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (empty($key)) {
 			return false;
 		}
@@ -102,7 +99,6 @@ class Cache extends Core {
 	 * @param int $expiretime
 	 */
 	static final public function Store($key, $data, $cachetype = CACHETYPE, $expiretime = 3600) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (empty($key) || empty($data)) {
 			return false;
 		}
@@ -129,22 +125,18 @@ class Cache extends Core {
 	 * @param int $expiretime
 	 */
 	static final public function Retrieve($key, $cachetype = CACHETYPE, $expiretime = 3600) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
-		if (DEBUG) _log('cachetype: '.$cachetype);
-		if (empty($key)) {
-			return false;
-		}
-		switch ($cachetype) {
-			case 'disk':
-				return self::_retrieveDisk($key, $expiretime);
+		if (!empty($key)) {
+			switch ($cachetype) {
+				case 'disk':
+					return self::_retrieveDisk($key, $expiretime);
 				break;
-			case 'redis':
-				return self::_retrieveRedis($key, $expiretime);
+				case 'redis':
+					return self::_retrieveRedis($key, $expiretime);
 				break;
-			default:
+				default:
 				return false;
+			}
 		}
-
 	}
 
 	/**
@@ -155,16 +147,8 @@ class Cache extends Core {
 	 * @return
 	 */
 	final static function ExpireKey($key, $cachetype = CACHETYPE) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
-		if (empty($key)) {
-			return false;
-		}
-		switch ($cachetype) {
-			case 'disk':
-				return self::_expireDisk($key);
-				break;
-			default:
-				return false;
+		if (!empty($key) && $cachetype == 'disk') {
+			return self::_expireDisk($key);
 		}
 	}
 
@@ -172,10 +156,9 @@ class Cache extends Core {
 	 * Expire cache from local storage by key name.
 	 * 
 	 * @param string $key
-	 * @return
+	 * @return bool
 	 */
 	static final private function _expireDisk($key) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		$c_key = CACHEPATH.'/'.$key.'.cache';
 		if (file_exists($c_key)) {
 			@unlink($c_key);
@@ -189,10 +172,9 @@ class Cache extends Core {
 	 * 
 	 * @param string $key
 	 * @param int $expire
-	 * @return
+	 * @return mixed
 	 */
 	static final private function _retrieveDisk($key, $expire) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		$c_key = CACHEPATH.'/'.$key.'.cache';
 		if (file_exists($c_key) && filemtime($c_key) < (time() - $expiretime)) {
 			if ($fp = fopen($c_key, 'r')) {
@@ -201,8 +183,7 @@ class Cache extends Core {
 					$data .= fread($fp, 1024);
 				}
 				fclose($fp);
-				$elements = unserialize($data);
-				return $elements;
+				return unserialize($data);
 			}
 		} else {
 			@unlink($c_key);
@@ -215,10 +196,9 @@ class Cache extends Core {
 	 * 
 	 * @param string $key
 	 * @param mixed $data
-	 * @return
+	 * @return bool
 	 */
 	static final private function _storeDisk($key, $data) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		$c_key = CACHEPATH.'/'.$key.'.cache';
 		if (file_exists($c_key)) {
 			@unlink($c_key);
@@ -238,10 +218,9 @@ class Cache extends Core {
 	 * @param string $key
 	 * @param mixed $data
 	 * @param integer $ttl
-	 * @return
+	 * @return bool
 	 */
 	static final private function _storeRedis($key, $data, $ttl = 0) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		return Redis::Set($key, $data, $ttl);
 	}
 
@@ -250,10 +229,9 @@ class Cache extends Core {
 	 * 
 	 * @param string $key
 	 * @param integer $expiretime
-	 * @return
+	 * @return bool
 	 */
 	static final private function _retrieveRedis($key, $expiretime = 3600) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		return Redis::Get($key);
 	}
 }

@@ -1,10 +1,10 @@
 <?php
-/*
- * Croissant Web Framework
+/**
+ * Croisssant Web Framework
  *
- * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2017 Tom Gordon
- *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
  */
 namespace Croissant;
 
@@ -18,7 +18,6 @@ Class Error extends Core {
 	 */
 	public static function Initialise() {
 		if (!isset(self::$core)) {
-			if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 			self::$core = parent::Initialise();
 			self::$core->fatal = false;
 		}
@@ -38,6 +37,8 @@ Class Error extends Core {
 			case RPC_ERROR:
 				self::$core->fatal = true;
 				break;
+			default:
+				self::$core->fatal = false;
 		}
 	}
 
@@ -52,7 +53,6 @@ Class Error extends Core {
 
 	static function ExceptionHandler($e) {
 		self::AddError($e->getMessage(), SOLR_ERROR, $e);
-		return;
 	}
 
 }

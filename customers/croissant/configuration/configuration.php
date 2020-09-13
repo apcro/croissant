@@ -27,8 +27,6 @@ $rootpath = implode($seperator, $path);
 $path = $rootpath.$seperator.$store.$seperator.$client;
 require_once('local.configuration.php');
 
-defined('USE_SHARED_CORE') or define('USE_SHARED_CORE', false);
-
 define('ROOTPATH', $rootpath);
 define('BASEPATH', $path);
 
@@ -39,14 +37,9 @@ define('SMARTY_COMPILE',	CACHEPATH.'/templates_c');
 define('SMARTY_CACHE',		CACHEPATH.'/smarty_cache');
 
 define('NOTFOUND',		'shared/error/404.tpl');
-define('NOTEMPLATE',	'shared/error/notemplate.tpl');
-define('NOVIDEO',		'shared/error/video404.tpl');
-
-defined('ENABLE_IPAD') or define('ENABLE_IPAD', 1);
-defined('ENABLE_IPHONE') or define('ENABLE_IPHONE', 1);
 
 // should we use browser caching?
-defined('USE_CACHING') or define('USE_CACHING', false);
+defined('USE_CACHING') || define('USE_CACHING', false);
 
 const OK	= 0;
 const NOTOK	= 1;
@@ -69,8 +62,4 @@ define('IS_AJAX_REQUEST', (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolow
 // now we get can the core library, if not a CSS file
 if (!strpos($_SERVER['SCRIPT_NAME'], 'css') && !strpos($_SERVER['SCRIPT_NAME'], 'images') && !strpos($_SERVER['SCRIPT_NAME'], 'js') && !strpos($_SERVER['REQUEST_URI'], 'css') ) {
 	require_once(ROOTPATH.'/libraries/core/core.library.php');
-	define('SVN_REVISION', get_svn_version());
-
-	// define any external libraries used in this application
-	Core::UsesClass('Smarty', ROOTPATH.'/libraries/external/Smarty-3.1.10/libs/Smarty.class.php');
 }

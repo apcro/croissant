@@ -1,27 +1,22 @@
-@import url(//fonts.googleapis.com/css?family=Lato:700);
-
 body {
 	margin:0;
 	font-family:'Lato', sans-serif;
-	text-align:center;
+	text-align: center;
 	color: #999;
 }
 
 .homepage {
-	width: 300px;
-	height: 200px;
-	position: absolute;
-	left: 50%;
-	top: 50%;
-	margin-left: -150px;
-	margin-top: -100px;
-}
-
-a, a:visited {
-	text-decoration:none;
+	display: flex;
+	align-items: center;
+	width: 100vw;
+	height: 100vh;
 }
 
 h1 {
-	font-size: 32px;
-	margin: 16px 0 0 0;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 2em;
+	width: 12em;
 }

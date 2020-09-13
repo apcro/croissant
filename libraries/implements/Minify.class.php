@@ -1,15 +1,15 @@
 <?php
-/*
- * Croissant Web Framework
+/**
+ * Croisssant Web Framework
  *
- * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2013 Tom Gordon
- *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
  */
 
 /**
  *
- * Minify
+ * Minify CSS & Javascript at runtime and cache the result for reuse
  *
  * Uses elements and code from http://code.google.com/p/minify/
  */
@@ -51,11 +51,7 @@ class Minify extends Core {
 	}
 
 	final static function Cached($file) {
-		if (file_exists(CACHEPATH.'/'.$file)) {
-			return true;
-		} else {
-			return false;
-		}
+		return file_exists(CACHEPATH.'/'.$file);
 	}
 
 	final static function GetFile($files) {
@@ -76,15 +72,6 @@ class Minify extends Core {
 					$css .= fread($fp, (1*(1024*1024)));
 				}
 				fclose($fp);
-				// clean up the slow way
-				$css = str_replace("include_once('../configuration/configuration.php');", '', $css);
-				$css = str_replace("include_once('../../configuration/configuration.php');", '', $css);
-				$css = str_replace("// this path must be relative to CSS file location", '', $css);
-
-				$css = str_replace('header("Content-type: text/css");', '', $css);
-				$css = str_replace('<?php echo IMAGE_SERVER ?>', IMAGE_SERVER, $css);
-				$css = str_replace('?>', '', $css);
-				$css = str_replace('<?php', '', $css);
 				self::$compressed .= self::MinifyCSS($css);
 			}
 		}

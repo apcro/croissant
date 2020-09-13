@@ -38,7 +38,7 @@ class Sanitiser extends Core {
 	private static $_html_allowed = array('comment', 'txt_aboutme', 'description', 'preliminary', 'reflective');
 
 	private static $never_allowed_str = array('document.cookie', "document['cookie']", 'document[cookie]', 'document.write', '.parentNode', '.innerHTML', 'window.location', '-moz-binding', '<!--', '-->', '<![CDATA[', 'alert(', "alert']", 'alert]'); //, 'cookie'); - we need to allow these normal english words
-	private static $never_allowed_regex = array("javascript\s*:" 									=> '[removed]',
+	private static $never_allowed_regex = array("javascript\s*:" => '[removed]',
 			"expression\s*(\(|&\#40;)" 						=> '[removed]', // CSS and IE
 			"vbscript\s*:" 									=> '[removed]', // IE, surprise!
 			"Redirect\s+302" 									=> '[removed]',
@@ -58,18 +58,18 @@ class Sanitiser extends Core {
 	 */
 	static public function Slurp($toxic, $overwrite = false) {
 		$temp = array();
-		if(is_array($toxic )) {
+		if (is_array($toxic )) {
 			if($overwrite || empty(self::$_waste )) {
 				unset(self::$_waste);
 				self::$_waste = $toxic;
 				return true;
 			} else {
-				if(isset(self::$_waste['content'])) {
+				if (isset(self::$_waste['content'])) {
 					$temp = self::$_waste;
 					unset(self::$_waste);
 					self::$_waste[] = $temp;
 				}
-				if(isset($toxic ['content'])) {
+				if (isset($toxic ['content'])) {
 					self::$_waste[] = $toxic;
 				} else {
 					foreach($toxic as $dirt) {
@@ -131,7 +131,7 @@ class Sanitiser extends Core {
 	 * @param $filter
 	 */
 	static public function _SpinCycle($content, $filter) {
-		call_user_func_array(array(&$this, $filter), array("content" => $content));
+		call_user_func_array(array(self, $filter), array("content" => $content));
 		return $content;
 	}
 
@@ -276,13 +276,13 @@ class Sanitiser extends Core {
 		*/
 		$found = false;
 		foreach(self::$never_allowed_str as $key) {
-			if(strstr($str, $key)) {
+			if (strstr($str, $key)) {
 				$str = str_replace($key, '', $str);
 				$found = true;
 			}
 		}
 		// we've detected suspicious data, so send the boys 'round
-		if($found) {
+		if ($found) {
 			$str = preg_replace("/[^a-zA-Z0-9\\040\\.\\-\\_\\/]/i", '', $str);
 		}
 		foreach(self::$never_allowed_regex as $key => $val) {
@@ -299,7 +299,7 @@ class Sanitiser extends Core {
 		* But it doesn't seem to pose a problem.
 		*
 		*/
-		if($is_image === TRUE) {
+		if ($is_image === TRUE) {
 			// Images have a tendency to have the PHP short opening and closing tags every so often
 			// so we skip those and only do the long opening tags.
 			$str = str_replace(array('<?php', '<?PHP' ), array('&lt;?php', '&lt;?PHP' ), $str);
@@ -317,7 +317,7 @@ class Sanitiser extends Core {
 		$words = array('javascript', 'expression', 'vbscript', 'script', 'applet', 'alert', 'document', 'write', 'cookie', 'window');
 		foreach($words as $word) {
 			$temp = '';
-			for($i = 0, $wordlen = strlen($word); $i < $wordlen; $i ++) {
+			for ($i = 0, $wordlen = strlen($word); $i < $wordlen; $i ++) {
 				$temp .= substr($word, $i, 1 ) . "\s*";
 			}
 			// We only want to do this when it is followed by a non-word character
@@ -332,13 +332,13 @@ class Sanitiser extends Core {
 		*/
 		do {
 			$original = $str;
-			if(preg_match("/<a/i", $str )) {
+			if (preg_match("/<a/i", $str )) {
 				$str = preg_replace_callback("#<a\s+([^>]*?)(>|$)#si", array('self', '_js_link_removal' ), $str);
 			}
-			if(preg_match("/<img/i", $str )) {
+			if (preg_match("/<img/i", $str )) {
 				$str = preg_replace_callback("#<img\s+([^>]*?)(\s?/?>|$)#si", array('self', '_js_img_removal' ), $str);
 			}
-			if(preg_match("/script/i", $str ) or preg_match("/xss/i", $str )) {
+			if (preg_match("/script/i", $str ) or preg_match("/xss/i", $str )) {
 				$str = preg_replace("#<(/*)(script|xss)(.*?)\>#si", '[removed]', $str);
 			}
 		} while($original != $str);
@@ -354,7 +354,7 @@ class Sanitiser extends Core {
 		*/
 		$event_handlers = array('[^a-z_\-]on\w*', 'xmlns');
 
-		if($is_image === TRUE) {
+		if ($is_image === TRUE) {
 			/*
 			* Adobe Photoshop puts XML metadata into JFIF images, including namespacing,
 			* so we have to allow this for images. -Paul
@@ -435,14 +435,9 @@ class Sanitiser extends Core {
 		*  However, if the string post-conversion does not matched the string post-removal of XSS,
 		*  then it fails, as there was unwanted XSS code found and removed/changed during processing.
 		*/
-		if($is_image === TRUE) {
-			if($str == $converted_string) {
-				return TRUE;
-			} else {
-				return FALSE;
-			}
+		if ($is_image === TRUE) {
+			return $str == $converted_string;
 		}
-		//log_message('debug', "XSS Filtering completed");
 		return $str;
 	}
 
@@ -458,7 +453,7 @@ class Sanitiser extends Core {
 	 */
 	static function _remove_invisible_characters($str) {
 		static $non_displayables;
-		if(!isset($non_displayables)) {
+		if (!isset($non_displayables)) {
 			// every control character except newline(dec 10), carriage return(dec 13), and horizontal tab(dec 09),
 			$non_displayables = array('/%0[0-8bcef]/', 		// url encoded 00-08, 11, 12, 14, 15
 					'/%1[0-9a-f]/', 		// url encoded 16-31
@@ -600,7 +595,7 @@ class Sanitiser extends Core {
 	 * @return	string
 	 */
 	static private function xss_hash() {
-		if(self::$xss_hash == '') {
+		if (self::$xss_hash == '') {
 			if(phpversion() >= 4.2) {
 				mt_srand();
 			} else {
@@ -639,28 +634,5 @@ class Sanitiser extends Core {
 	 */
 	static public function FILTER_XSS_CLEAN($content) {
 		return self::xss_clean($content);
-	}
-
-	/**
-	 * FILTER_FILENAME_SECURITY
-	 * Borrowed from CI 1.7.1 from Input.php
-	 *
-	 * @param $content
-	 * @return strip slashes of the content
-	 */
-	static private function FILTER_FILENAME_SECURITY($content) {
-		$bad = array("../", "./", "<!--", "-->", "<", ">", "'", '"', '&', '$', '#', '{', '}', '[', ']', '=', ';', '?', "%20", "%22", "%3c", // <
-				"%253c", 	// <
-				"%3e", 	// >
-				"%0e", 	// >
-				"%28", 	// (
-				"%29", 	// )
-				"%2528", 	// (
-				"%26", 	// &
-				"%24", 	// $
-				"%3f", 	// ?
-				"%3b", 	// ;
-				"%3d"); 	// =
-		return stripslashes(str_replace($bad, '', $content));
 	}
 }

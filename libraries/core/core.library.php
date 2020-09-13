@@ -1,10 +1,10 @@
 <?php
-/*
- * Croissant Web Framework
+/**
+ * Croisssant Web Framework
  *
- * @author Tom Gordon <tom.gordon@apsumon.com>
- * @copyright 2009-2017 Tom Gordon
- *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
  */
 namespace Croissant;
 
@@ -22,8 +22,8 @@ spl_autoload_register ('Croissant\__autoload' );
 require_once(ROOTPATH.'/libraries/core/core.defines.php');
 
 // load any composer-based packages
-if (file_exists(BASEPATH.'/libraries/vendor/autoload.php')) {
-	require_once(BASEPATH.'/libraries/vendor/autoload.php');
+if (file_exists(ROOTPATH.'/libraries/vendor/autoload.php')) {
+	require_once(ROOTPATH.'/libraries/vendor/autoload.php');
 }
 
 // Start the static object
@@ -94,46 +94,30 @@ function __autoload($class) {
 				// supports both namespaced and non-namespaced third party classes
 				// also checks the /implements/ folder if no explicit match is found
 				$ns_class = explode('\\', $class);
-				switch($ns_class[0]) {
-					case 'JSON':
-						include(ROOTPATH.'/libraries/external/JSON.class.php');
-						break;
-					case 'Smarty':
-						include(ROOTPATH.'/libraries/external/Smarty-3.1.13/libs/Smarty.class.php');
-						break;
-					case 'DOMPDF':
-						include(ROOTPATH.'/libraries/external/dompdf/dompdf_config.inc.php');
-						break;
-
-					default:
-						if (file_exists(ROOTPATH.'/libraries/implements/'.$ns_class[0].'/'.$ns_class[1].'.class.php')) {
-							include(ROOTPATH.'/libraries/implements/'.$ns_class[0].'/'.$ns_class[1].'.class.php');
-							if (method_exists($class, 'Initialise')) {
-								$class::Initialise();
-								$_classes_i[$ns_class[1]] = 1;
-							}
-							$class = $ns_class[1];
-						}
-						if (file_exists(ROOTPATH.'/libraries/external/'.$ns_class[0].'/'.$ns_class[1].'.class.php')) {
-							include(ROOTPATH.'/libraries/implements/'.$ns_class[0].'/'.$ns_class[1].'.class.php');
-							$class = $ns_class[1];
-							if (method_exists($class, 'Initialise')) {
-								$class::Initialise();
-								$_classes_i[$ns_class[1]] = 1;
-							}
-						}
-						break;
+				if (file_exists(ROOTPATH.'/libraries/implements/'.$ns_class[0].'/'.$ns_class[1].'.class.php')) {
+					include(ROOTPATH.'/libraries/implements/'.$ns_class[0].'/'.$ns_class[1].'.class.php');
+					if (method_exists($class, 'Initialise')) {
+						$class::Initialise();
+						$_classes_i[$ns_class[1]] = 1;
+					}
+					$class = $ns_class[1];
+				}
+				if (file_exists(ROOTPATH.'/libraries/external/'.$ns_class[0].'/'.$ns_class[1].'.class.php')) {
+					include(ROOTPATH.'/libraries/external/'.$ns_class[0].'/'.$ns_class[1].'.class.php');
+					$class = $ns_class[1];
+					if (method_exists($class, 'Initialise')) {
+						$class::Initialise();
+						$_classes_i[$ns_class[1]] = 1;
+					}
 				}
 			}
 		}
 		$_SESSION['_classes'] = $_classes;
 	}
-	// only call class initialisation once
-	if (!isset($_classes_i[$class])) {
-		if (method_exists($class, 'Initialise')) {
-			$class::Initialise();
-			$_classes_i[$class] = 1;
-		}
+	// only call class initialisation once per session
+	if (!isset($_classes_i[$class]) && method_exists($class, 'Initialise')) {
+		$class::Initialise();
+		$_classes_i[$class] = 1;
 	}
 	$_SESSION['_classes_i'] = $_classes_i;
 }
@@ -145,7 +129,7 @@ function __autoload($class) {
  * @param bool $fb
  * @return void
  */
-function dump($var, $fb=false) {
+function dump($var) {
 	echo '<pre>';
 	if (empty($var)) {
 		echo '(passed variable was empty)';
@@ -161,15 +145,13 @@ function dump($var, $fb=false) {
  * @param string $function
  * @param mixed $parameters
  * @param string $database
- * @return
+ * @return mixed
  */
 function ds($function, $parameters = array(), $database = '') {
 	// if we already have a fatal error, no point in continuing
 	if (Error::IsFatal()) {
 		return false;
 	}
-
-	if (DEBUG) $start = microtime(TRUE);
 
 	if ($database == '') {
 		$database = (DATABASE!='DATABASE'?DATABASE:'');
@@ -195,14 +177,10 @@ function ds($function, $parameters = array(), $database = '') {
 						'content' => $senddata
 					));
 	$context = stream_context_create($headers);
-	if ($filepointer = @fopen('http://'.DATASERVER.'/', 'rb', false, $context)) {
+
+	if ($filepointer = @fopen(DATASERVER, 'rb', false, $context)) {
 		$returndata = stream_get_contents($filepointer);
 		$response = unserialize($returndata);
-		if (DEBUG) {
-			$end = microtime(TRUE);
-			$debug = array('func' => $function, 'time' => number_format(($end-$start) * 1000, 2), 'sql' => isset($response['sql'])?$response['sql']:'No sql for function '.$function, 'memory' => isset($response['peak_memory'])?$response['peak_memory']:'');
-			Core::SetDebugData($debug);
-		}
 		if (isset($response['statusCode']) && $response['statusCode'] != OK) {
 			Error::AddError($response['errorMessage'], $response['errorType'], $response['errorData']);
 		}
@@ -236,7 +214,6 @@ function ds($function, $parameters = array(), $database = '') {
  * @return
  */
 function _log($data) {
-	if (DEBUG != 1) return;
 	if (!strpos($_SERVER['QUERY_STRING'], 'images')) {
 		if ($data == 'Page end') {
 			$extra = "\n\n-------------------------\n\n";
@@ -252,64 +229,5 @@ function _log($data) {
 		$fp = fopen($logfile, 'a+');
 		fwrite($fp, $data, strlen($data));
 		fclose($fp);
-	}
-}
-
-/**
- * Get svn version.
- *
- * @param string $file
- * @return
- */
-function get_svn_version($file = '') {
-	if ($file != '') {
-		$check = dirname($file). DIRECTORY_SEPARATOR . '.svn' . DIRECTORY_SEPARATOR . 'entries';
-	} else {
-		$check = BASEPATH . DIRECTORY_SEPARATOR . '.svn' . DIRECTORY_SEPARATOR . 'entries';
-	}
-	if (file_exists($check)) {
-		$svn = file($check);
-		if (is_numeric(trim($svn[3]))) {
-			$base_version = (int) trim($svn[3]);
-		} else { // pre 1.4 svn used xml for this file
-			$parts = explode('"', $svn[4]);
-			$base_version = (int) trim($parts[1]);
-		}
-		if ($file != '') {
-			$version = 0;
-			$filename = basename($file);
-			foreach($svn as $k => $v) {
-				if (trim($v) == $filename) {
-					if (!empty($svn[$k+2])) {
-						$version = $svn[$k+2];
-						break;
-					}
-				}
-			}
-			if ($version == 0) {
-				$version = $base_version;
-			}
-		} else {
-			$version = $base_version;
-		}
-		unset($svn);
-	} else {
-		$version = 0;
-	}
-	return $version;
-}
-
-/**
- * Returns either the data call response data or false.
- *
- * @param array $response
- * @return
- */
-function genericResponse($response) {
-	if (isset($response['statusCode']) && $response['statusCode'] == 0) {
-		return $response['result'];
-	} else {
-		return $response;
-		return false;
 	}
 }

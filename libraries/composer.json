@@ -1,9 +1,10 @@
 {
-	"name": "croissant",
+	"name": "Croissant/Croissant",
 	"description": "The Croissant Framework.",
 	"keywords": ["framework", "croissant"],
 	"license": "private",
 	"require": {
+		"smarty/smarty": "~3.1"
 	},
 	"config": {
 	},
