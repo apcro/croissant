@@ -2,14 +2,13 @@
 
 Croissant is a simple to use web framework designed for speed and scalability.
 
-## Official Documentation
+# Development
+Primary development of the framework is ongoing in the `2.0` branch. The `1.0` branch is being retained currently for historical purposes.
 
-Documentation for the framework can be found on the [Croissant website](http://www.croissant-framework.com/). This documentation is currently incomplete.
-
-### Contributing To Croissant
+# Contributing To the Croissant Framework
 
 **All issues and pull requests should be filed on the [apcro/croissant](http://github.com/apcro/croissant) repository.**
 
-### License
+# License
 
 The Croissant framework is copyright Tom Gordon

@@ -1,1 +1,0 @@
-You can place your CSS files here. This folder is named 'css' only for convenience, and CSS can be placed in any folder, as long as you reference it properly either directly in your HTML or in calls to Core::AddCSS()
