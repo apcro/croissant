@@ -168,12 +168,12 @@ class Sanitiser extends Core {
 		/*
 		* Is $str an array?
 		*/
-		if(is_array($str)) {
-			while(list($key) = each($str)) {
-				$str[$key] = self::xss_clean($str[$key], false, $key);
-			}
-			return $str;
-		}
+	    if (is_array($str)) {
+	        foreach($str as $key => $value) {
+	            $str[$key] = self::xss_clean($value, false, $key);
+	        }
+	        return $str;
+	    }
 
 		// Strip out the obvious stuff first
 		$search = array('@<script[^>]*?>.*?</script>@si',	// Strip out javascript
