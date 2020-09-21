@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', event => {
 	if (typeof(debugBar) != undefined) {
 
 		document.getElementsByClassName('debug_bar')[0].addEventListener('mouseenter', e => {
-			popout.style.display = "flex";
+			popout.style.display = "block";
 		});
 		document.getElementsByClassName('debug_bar')[0].addEventListener('mouseleave', e => {
 			popout.style.display = "none";

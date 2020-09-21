@@ -1,4 +1,11 @@
 <?php
+/**
+ * Croisssant Web Framework
+ *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
+ */
 namespace Croissant;
 
 if (User::UserID() == 0) {
@@ -14,6 +21,8 @@ if (User::UserID() == 0) {
 			break;
 		case 'forgotpwd':
 			include('user/forgotpwd.php');
+			break;
+		default:
 			break;
 
 	}

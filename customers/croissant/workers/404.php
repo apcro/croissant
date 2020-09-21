@@ -1,5 +1,12 @@
 <?php
+/**
+ * Croisssant Web Framework
+ *
+ * @copyright 2009-present Tom Gordon
+ * @author Tom Gordon
+ * @version 2.0
+ */
 namespace Croissant; 
  
-$template = 'shared/error/404.tpl';
-$page_title = 'Not found';
+Core::Template('shared/error/404.tpl');
+Core::PageTitle('Not found');

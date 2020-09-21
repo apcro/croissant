@@ -1,12 +1,15 @@
 <?php
 namespace Croissant;
 
+// Debug::PointTime('Add Javascript');
 // Custom Javascript elements
-Core::AddJavascript('homepage.js');
+// Core::AddJavascript('homepage.js');
 
+Debug::PointTime('Add CSS');
 // Custom CSS elements
 Core::AddCSS('homepage.css');
 
+Debug::PointTime('Set Template & Title');
 // page-specific settings
-$template = 'homepage/homepage.tpl';
-$page_title = 'Croissant Framework';
+Core::Template('homepage/homepage.tpl');
+Core::PageTitle('Croissant Framework');

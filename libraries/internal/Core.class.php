@@ -17,7 +17,11 @@ class Core {
 	public static $_url_alias_list;
 	public static $core_debugging;
 	public bool $fatal;
+	private static $_template = NOTEMPLATE;
 	private string $_template_override = '';
+	public static $page_title = DEFAULT_PAGE_TITLE;
+	public static $page_meta = DEFAULT_PAGE_META;
+	public static $page_keywords = DEFAULT_PAGE_KEYWORDS;
 
 	/**
 	 * Initialise.
@@ -37,8 +41,27 @@ class Core {
 			self::$core->_configuration = array();
 			self::$core->_configuration['parse_type'] = 'CONTROLLER';	// the default
 			date_default_timezone_set('UTC');
+
+			self::$core->_page_title = DEFAULT_PAGE_TITLE;
+			self::$core->_page_meta = DEFAULT_PAGE_META;
+			self::$core->_page_keywords = DEFAULT_PAGE_KEYWORDS;
+
 		}
 		return self::$core;
+	}
+
+	public static function Setup() {
+		if (isset($_SERVER['REQUEST_URI']) && strstr($_SERVER['REQUEST_URI'], 'croissant=')) {
+			header('location: /');
+			die();
+		}
+		
+		$_REQUEST = Sanitiser::FILTER_XSS_CLEAN($_REQUEST);
+		$_POST = Sanitiser::FILTER_XSS_CLEAN($_POST);
+		$_GET = Sanitiser::FILTER_XSS_CLEAN($_GET);
+		$_COOKIE = Sanitiser::FILTER_XSS_CLEAN($_COOKIE);
+
+		Debug::PageStart();
 	}
 
 	/**
@@ -95,6 +118,10 @@ class Core {
 		}
 	}
 
+	public static function Template($template) {
+		self::$_template = $template;
+		Debug::Template($template);
+	}
 
 	/**
 	 * Shortcut for smarty template fetch.
@@ -119,9 +146,11 @@ class Core {
 	 * @param string $template
 	 * @return void
 	 */
-	public static function Display($template) {
+	public static function Display() {
 		Session::Store();
 
+		$template = self::$_template;
+		
 		$tplHeaders   = array();
 		if ($template == 'shared/error/404.tpl') {
 			$tplHeaders[] = "HTTP/1.0 404 Not Found";
@@ -130,7 +159,7 @@ class Core {
 		} else {
 			$tplHeaders[] = "HTTP/1.0 200 OK";
 		}
-
+		
 		if (USE_CACHING) {
 			$tplHeaders[] = 'Cache-Control: max-age=604800, must-revalidate';
 		} else {
@@ -139,37 +168,37 @@ class Core {
 			$tplHeaders[] = 'Expires: Mon, 26 Jul 1997 05:00:00 GMT';
 			$tplHeaders[] = 'Last-Modified: ' . date('D, d M Y H:i:s', time()) . ' GMT';
 		}
-
+		
 		$tplHeaders[] = "Content-Type: text/html";
-
+		
 		foreach ( $tplHeaders as $header ) {
 			header($header);
 		}
-
+		
 		if (Error::IsFatal()) {
 			echo self::Fetch('maintenance_page/maintenance.html');
 			die();
 		}
-
+		
 		self::SetBaseTemplate();
-
+		
 		if (CSS_MINIFIED == 1) {
 			$css_minified = Minify::GetFile(self::$core->smarty->tpl_vars['css_files']);
 			self::Assign('css_minified', $css_minified);
 		}
-
+		
 		if (JS_MINIFIED == 1) {
 			$js_minified_header = Minify::GetJSFile(self::$core->smarty->tpl_vars['js_files_header']);
 			self::Assign('js_minified_header', $js_minified_header);
 			$js_minified_footer = Minify::GetJSFile(self::$core->smarty->tpl_vars['js_files_footer']);
 			self::Assign('js_minified_header', $js_minified_footer);
 		}
-
+		
 		if (self::$core->_template_override == '') {
 			if (!self::TemplateExists($template)) {
 				$template = NOTEMPLATE;
 			}
-
+			
 			self::Assign('controller_template', $template);
 			self::Assign('page_title', self::PageTitle());
 			self::Assign('page_meta', self::PageMeta());
@@ -329,7 +358,7 @@ class Core {
 	static function SetDebugData($data) {
 		self::$core_debugging[] = $data;
 	}
-
+		
 	/**
 	 * Get debug data.
 	 *
@@ -401,6 +430,7 @@ class Core {
 	 */
 	static final public function ParseURL($url) {
 		if (empty($url)) {
+			Debug::PointTime('Empty Response');
 			$response = array();
 			$response['redirect'] = 0;
 			$response['location'] = '/';
@@ -408,15 +438,18 @@ class Core {
 			return $response;
 		}
 
+		Debug::PointTime('Cleanup URL');
 		// strip unwanted characters
 		$url = preg_replace('/[^a-zA-Z0-9,-=&?_+\ ]/', '', $url);
 		// remove double spaces
 		$url = preg_replace('!\s+!', ' ', $url);
 
+		Debug::PointTime('Explode URL');
 		$args = explode('/', $url);
 
 		$args0 = array_shift($args);
 
+		Debug::PointTime('Parse URL parts');
 		foreach($args as $k => $arg) {
 			if (strstr($arg, '[removed]')) {
 				unset($args[$k]);
@@ -430,27 +463,7 @@ class Core {
 		array_unshift($args, $args0);
 		$url = implode('/', $args);
 
-		switch(self::$core->_configuration['parse_type']) {
-			case 'ALIAS':
-				return self::_parseURL_Alias($url);
-				break;
-			case 'CONTROLLER':
-			default:
-				return self::_parseURL_Controller($url, $args);
-				break;
-		}
-	}
-
-
-	/**
-	 * Parse url to controller.
-	 * use pre-split array to save time.
-	 *
-	 * @param string $url
-	 * @param array $args
-	 * @return array
-	 */
-	static final private function _parseURL_Controller($url, $args) {
+		Debug::PointTime('Create response');
 		$response = array();
 		$response['redirect'] = 0;
 		$response['location'] = '/';
@@ -460,36 +473,14 @@ class Core {
 			$response['redirect'] = 1;
 			return $response;
 		}
+
+		Debug::PointTime('Set function');
 		$response['function'] = array_shift($args);
 
+		Debug::PointTime('Check function');
 		$response['function'] = !empty($response['function'])?$response['function']:'homepage';
 		$response['args'] = $args;
 		$response['tp'] = $url;
-		return $response;
-	}
-
-	/**
-	 * Parse url alias
-	 *
-	 * @param string $url
-	 * @param array $args
-	 * @return array
-	 */
-	static final private function _parseURL_Alias($url, $args) {
-		$response = array();
-		$response['redirect'] = 0;
-		$response['location'] = '/';
-		$response['function'] = 'homepage';
-
-		if (strtolower($args[0]) == 'index') {
-			$response['redirect'] = 1;
-			return $response;
-		}
-		$response['function'] = array_shift($args);
-		$response['function'] = !empty($response['function'])?$response['function']:'homepage';
-		$response['args'] = $args;
-		$response['tp'] = $url;
-		return $response;
 	}
 
 	/**
@@ -500,7 +491,6 @@ class Core {
 	 * @return array/false
 	 */
 	static function GenericResponse($response) {
-		if (DEBUG) _log(__CLASS__.'::'.__FUNCTION__);
 		if (isset($response['statusCode']) && $response['statusCode'] == 0) {
 			return $response['result'];
 		} else {

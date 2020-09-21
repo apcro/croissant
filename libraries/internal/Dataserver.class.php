@@ -8,17 +8,6 @@
  */
 namespace Croissant;
 
-/**
- * Croisssant Web Framework
- * @copyright 2009-2017 Tom Gordon
- *
- * @author Tom Gordon
- *
- * Provides a wrapper for accessing redis key/value server
- *
- * Native implementation using sockets
- *
- */
 class Dataserver extends Core {
 	static $core;
 

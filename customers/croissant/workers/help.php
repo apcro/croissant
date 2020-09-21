@@ -1,4 +1,4 @@
 <?php
 namespace Croissant;
 
-$template = 'shared/help.tpl';
+Core::Template('shared/help.tpl');

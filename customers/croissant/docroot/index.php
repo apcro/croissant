@@ -15,33 +15,17 @@ error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_STRICT);
 
 require_once('../configuration/configuration.php');
 
-if (strpos($_SERVER['REQUEST_URI'], 'css')) {
-	include(BASEPATH.'/workers/css.php');
-	die();
-}
-
-if (strpos($_SERVER['REQUEST_URI'], 'js')) {
-	include(BASEPATH.'/workers/js.php');
-	die();
-}
-
-if (isset($_SERVER['REQUEST_URI']) && strstr($_SERVER['REQUEST_URI'], 'croissant=')) {
-	header('location: /');
-	die();
-}
-
-$_REQUEST = Sanitiser::FILTER_XSS_CLEAN($_REQUEST);
-$_POST = Sanitiser::FILTER_XSS_CLEAN($_POST);
-$_GET = Sanitiser::FILTER_XSS_CLEAN($_GET);
-$_COOKIE = Sanitiser::FILTER_XSS_CLEAN($_COOKIE);
+Core::Setup();
 
 extract($_REQUEST, EXTR_PREFIX_SAME, '__');    // stops overwriting existing variable values
 unset($_REQUEST);unset($_POST);unset($_GET);
 
 $croissant = isset($croissant)?$croissant:''; // from .httaccess
+Debug::PointTime('ParseURL');
 $response = Core::ParseURL($croissant);
 
 $function = $response['function'];
+Debug::SetFunction($function);
 
 if ($response['redirect'] == 1) {
 	if (isset($response['code'])) {
@@ -51,72 +35,50 @@ if ($response['redirect'] == 1) {
 	}
 	die();
 } else {
+	Debug::PointTime('Assign Variables');
 	foreach($response as $k => $v) {
 		${$k} = $v;
 		Core::Assign($k, $v);
 	}
 }
 
-$template = NOTEMPLATE;
+Debug::PointTime('Bootstrap complete');
 if (file_exists(BASEPATH.'/workers/'.$function.'.php')) {
 	try {
-		// we're going to load a worker, so even if we don't display a page,
-		// push this onto the top of the JS output list
-		Core::AddJavascript('croissant.js');
-
+		Debug::ControllerStart();
 		include(BASEPATH.'/workers/'.$function.'.php');
-		Core::PageTitle(!empty($page_title)?$page_title:DEFAULT_PAGE_TITLE);
-		Core::PageMeta(!empty($page_meta)?$page_meta:DEFAULT_PAGE_META);
-		Core::PageKeywords(!empty($page_keywords)?$page_keywords:DEFAULT_PAGE_KEYWORDS);
-		Core::Assign('page_og_url' , Core::GetCurrentUrl()) ;
+		Debug::ControllerEnd();
 	} catch (Exception $e) {
 		$e_code = $e->getCode();
 		switch ($e_code) {
 			case 103:
 				Core::Assign('errorMessage', 'Communication error with the data server.');
-				if (DEBUG) {
-					Core::Assign('errorData', nl2br($e));
-				}
 				Core::Display('errorpages/showerror.tpl');
 				die();
-				break;
 			case 7997:
 				Core::Display_override('errorpages/nodataserver.tpl');
 				die();
-				break;
 			default:
 				dump($e);
 				die();
-				break;
 		}
 	}
+	/* ****************************************************************************************************
+	 * Include client-specific code
+	 ******************************************************************************************************/
+	include(DOCROOT.'/'.CLIENT.'.php');
+
 } else {
-	$template = NOTFOUND;
-}
-
-/* ****************************************************************************************************
- * Include client-specific code
- ******************************************************************************************************/
-include(DOCROOT.'/'.CLIENT.'.php');
-
-// Include the 404 worker
-if ($template == NOTFOUND) {
+	Core::Template(NOTFOUND);
 	include(BASEPATH.'/workers/404.php');
-
-	// we need to override the previously set data
-	Core::PageTitle(!empty($page_title)?$page_title:DEFAULT_PAGE_TITLE);
-	Core::PageMeta(!empty($page_meta)?$page_meta:DEFAULT_PAGE_META);
-	Core::PageKeywords(!empty($page_keywords)?$page_keywords:DEFAULT_PAGE_KEYWORDS);
 }
-
 
 /* ****************************************************************************************************
  * Debugging output
  ******************************************************************************************************/
-if (DEBUG) {
-	include('debug.php');
-}
+Debug::DebugOut();
+
 /* ****************************************************************************************************
- * This is the final call made by every page - display the selected template.
- ******************************************************************************************************/
-Core::Display($template);
+* This is the final call made by every page - display the selected template.
+******************************************************************************************************/
+Core::Display();

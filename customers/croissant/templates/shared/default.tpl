@@ -8,7 +8,7 @@
 	<meta name="Copyright" content="" />
 
 	<title>{if $page_title}{$page_title} | {/if}</title>
-	<link rel="shortcut icon" href="http://{$HTTP_HOST}/favicon.ico" />
+	<link rel="shortcut icon" href="/favicon.ico" />
 	<!--[if IE 8]><link href="/css/ie8.css" rel="stylesheet" media="screen" /><![endif]-->
 	<!--[if IE 7]><link href="/css/ie7.css" rel="stylesheet" media="screen" /><![endif]-->
 

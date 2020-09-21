@@ -1,4 +1,4 @@
 <?php
 namespace Croissant;
 
-$template = 'privacy.tpl';
+Core::Template('privacy.tpl');

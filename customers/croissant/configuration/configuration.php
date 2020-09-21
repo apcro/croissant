@@ -50,16 +50,14 @@ define('FILECACHE', CACHEPATH);
 define('STATELESS', 0); // 0 == normal, 1 = load session data from the dataserver
 
 // Default Text for META data
-define('DEFAULT_PAGE_TITLE',	'');
-define('DEFAULT_PAGE_META',		'');
-define('DEFAULT_PAGE_KEYWORDS',	'');
+define('DEFAULT_PAGE_TITLE',	'Croissant Framework');
+define('DEFAULT_PAGE_META',		DEFAULT_PAGE_TITLE);
+define('DEFAULT_PAGE_KEYWORDS',	DEFAULT_PAGE_TITLE);
 
 // Base template
-defined('BASE_TEMPLATE') or define('BASE_TEMPLATE', 'shared/default.tpl');
+defined('BASE_TEMPLATE') || define('BASE_TEMPLATE', 'shared/default.tpl');
 
 define('IS_AJAX_REQUEST', (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'));
 
 // now we get can the core library, if not a CSS file
-if (!strpos($_SERVER['SCRIPT_NAME'], 'css') && !strpos($_SERVER['SCRIPT_NAME'], 'images') && !strpos($_SERVER['SCRIPT_NAME'], 'js') && !strpos($_SERVER['REQUEST_URI'], 'css') ) {
-	require_once(ROOTPATH.'/libraries/core/core.library.php');
-}
+require_once(ROOTPATH.'/libraries/core/core.library.php');

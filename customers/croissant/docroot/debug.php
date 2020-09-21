@@ -11,9 +11,8 @@ namespace Croissant;
 $page_end = microtime(TRUE);
 Core::Assign('debug_totaltime', number_format(($page_end-$page_start) * 1000, 2).'ms');
 $debugout = '';
-$debugout.= '<strong>Total execution time:</strong> '.number_format(($page_end-$page_start) * 1000, 2).'ms.<br />';
-$debugout.= '<strong>Controller execution time:</strong> '.number_format(($controller_end-$controller_start) * 1000, 2).'ms.<br />';
-$debugout.= '<strong>Current SVN revision:</strong> '.SVN_REVISION.'<br />';
+$debugout .= '<strong>Total execution time:</strong> '.number_format(($page_end-$page_start) * 1000, 2).'ms.<br />';
+$debugout .= '<strong>Controller execution time:</strong> '.number_format(($controller_end-$controller_start) * 1000, 2).'ms.<br />';
 $debugout .= '<strong>Point timers:</strong><br />';
 foreach ($point_timer as $k => $v) {
 	$debugout .= '&raquo;&nbsp;'.$v[0].' at ';
