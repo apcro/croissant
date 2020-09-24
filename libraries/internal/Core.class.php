@@ -481,6 +481,7 @@ class Core {
 		$response['function'] = !empty($response['function'])?$response['function']:'homepage';
 		$response['args'] = $args;
 		$response['tp'] = $url;
+		return $response;
 	}
 
 	/**

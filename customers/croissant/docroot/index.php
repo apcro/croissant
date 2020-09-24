@@ -27,6 +27,7 @@ $response = Core::ParseURL($croissant);
 $function = $response['function'];
 Debug::SetFunction($function);
 
+
 if ($response['redirect'] == 1) {
 	if (isset($response['code'])) {
 		header('Location: '.$response['location'], true, $response['code']);
