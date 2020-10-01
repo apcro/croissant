@@ -54,6 +54,9 @@ define('DEFAULT_PAGE_TITLE',	'Croissant Framework');
 define('DEFAULT_PAGE_META',		DEFAULT_PAGE_TITLE);
 define('DEFAULT_PAGE_KEYWORDS',	DEFAULT_PAGE_TITLE);
 
+// set the default NOTEMPLATE template
+defined('NOTEMPLATE') || define('NOTEMPLATE', 'shared/error/notemplate.tpl');
+
 // Base template
 defined('BASE_TEMPLATE') || define('BASE_TEMPLATE', 'shared/default.tpl');
 
