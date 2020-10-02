@@ -8,12 +8,12 @@ Each of these elements will also be covered in more detail elsewhere in the docu
 ## File-system Routing
 Croissant uses file-system routing, and every `.php` file in the `workers` folder automatically becomes a route.
 
-[Read the documentation &raquo;](documentation/filesystem-routing.md)
+[Read the documentation &raquo;](filesystem-routing.md)
 
 ## Composer-based Routing
 Croissant also supports composer-based router providers.
 
-[Read the documentation &raquo;](documentation/composer-routing.md)
+[Read the documentation &raquo;](composer-routing.md)
 
 # Accessing framework methods and function
 Croissant uses a static Singleton approach to it's internal classes, so no special steps are needed to access any of the libraries or methods within the Croissant framework, as the `index.php` preamble takes care of loading everything.
