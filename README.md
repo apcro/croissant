@@ -3,7 +3,7 @@
 Croissant is a simple to use web framework designed for speed and scalability.
 
 # Development
-Primary development of the framework is ongoing in the `2.0` branch. The `1.0` branch is being retained currently for historical purposes.
+Primary development of the framework is ongoing in the [2.0](https://github.com/apcro/croissant-website/tree/2.0) branch. The `1.0` branch is being retained currently for historical purposes.
 
 # Contributing To the Croissant Framework
 
